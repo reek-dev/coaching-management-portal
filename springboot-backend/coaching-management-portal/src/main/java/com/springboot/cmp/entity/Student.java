@@ -1,30 +1,17 @@
 package com.springboot.cmp.entity;
 
-import java.io.Serializable;
-import java.util.List;
-
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.springboot.cmp.util.GenderAttributeConverter;
+import jakarta.persistence.*;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import com.springboot.cmp.util.GenderAttributeConverter;
-
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.ManyToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import java.io.Serial;
+import java.io.Serializable;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -36,7 +23,8 @@ import lombok.ToString;
 @DynamicInsert
 @DynamicUpdate
 public class Student implements Serializable {
-	private static final long serialVersionUID = 1L;
+
+	@Serial private static final long serialVersionUID = 1L;
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -53,27 +41,31 @@ public class Student implements Serializable {
 	@Column(name = "gender", length = 2, updatable = true, nullable = false)
 	private Gender gender;
 
+	@Column(name = "email", length = 60, updatable = true, nullable = false)
+	private String emailId;
+
 	@Column(name = "phone_no", length = 10, updatable = true, nullable = false)
 	private String phoneNo;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JsonIgnore
+	@JoinColumn(name = "address_id")
+	private Address address;
 
 	@CreationTimestamp
 	@Column(name = "date_registered")
 	private java.sql.Timestamp dateRegistered;
 
-	@ManyToMany(fetch = FetchType.LAZY)
-	@JoinTable(
-		name = "STUDENT_TEACHER",
-		joinColumns = @JoinColumn(name = "student_id"),
-		inverseJoinColumns = @JoinColumn(name = "teacher_id")
-	)
-	private List<Teacher> teachers;
+	@UpdateTimestamp
+	@Column(name = "date_updated")
+	private java.sql.Timestamp dateUpdated;
 
 	@ManyToMany(fetch = FetchType.LAZY)
+	@JsonIgnore
 	@JoinTable(
 		name = "STUDENT_COURSE",
 		joinColumns = @JoinColumn(name = "student_id"),
 		inverseJoinColumns = @JoinColumn(name = "course_id")
 	)
-	private List<Course> courses;
-
+	private Set<Course> enrolledCourses;
 }

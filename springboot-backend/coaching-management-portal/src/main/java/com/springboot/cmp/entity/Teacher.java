@@ -1,31 +1,18 @@
 package com.springboot.cmp.entity;
 
-import java.io.Serializable;
-import java.time.LocalDate;
-import java.util.List;
-
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
-import org.hibernate.annotations.GenericGenerator;
-
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.springboot.cmp.util.GenderAttributeConverter;
+import jakarta.persistence.*;
+import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.UpdateTimestamp;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Convert;
-import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-import jakarta.persistence.Table;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
-import lombok.ToString;
+import java.io.Serializable;
+import java.time.LocalDate;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -60,6 +47,18 @@ public class Teacher implements Serializable {
 	@Convert(converter = GenderAttributeConverter.class)
 	@Column(name = "gender", length = 2, nullable = false)
 	private Gender gender;
+
+	@OneToOne(cascade = CascadeType.ALL)
+	@JoinColumn(name = "address_id", referencedColumnName = "id")
+	private Address address;
+
+	@CreationTimestamp
+	@Column(name = "date_registered")
+	private java.sql.Timestamp dateRegistered;
+
+	@UpdateTimestamp
+	@Column(name = "date_updated")
+	private java.sql.Timestamp dateUpdated;
 	
 	@Column(name = "email", length = 100, nullable = false)
 	private String emailId;
@@ -70,5 +69,5 @@ public class Teacher implements Serializable {
 
 	@JsonIgnore
 	@OneToMany(fetch = FetchType.EAGER, mappedBy = "teacher")
-	private List<Course> courses;
+	private Set<Course> courses;
 }

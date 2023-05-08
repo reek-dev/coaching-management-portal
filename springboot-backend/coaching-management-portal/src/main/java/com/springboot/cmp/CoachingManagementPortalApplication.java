@@ -9,5 +9,4 @@ public class CoachingManagementPortalApplication {
 	public static void main(String[] args) {
 		SpringApplication.run(CoachingManagementPortalApplication.class, args);
 	}
-
 }

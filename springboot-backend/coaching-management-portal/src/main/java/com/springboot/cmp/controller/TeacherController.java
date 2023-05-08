@@ -2,21 +2,14 @@ package com.springboot.cmp.controller;
 
 import com.springboot.cmp.entity.Teacher;
 import com.springboot.cmp.service.TeacherService;
-
 import jakarta.validation.Valid;
-
-import java.util.List;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequestMapping("api/teachers")
@@ -29,6 +22,7 @@ public class TeacherController {
     }
 
     // REST API: create a teacher
+//    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("create")
     public ResponseEntity<Teacher> createTeacher(@Valid @RequestBody Teacher teacher) {
         Teacher newTeacher = teacherService.createTeacher(teacher);
@@ -36,14 +30,15 @@ public class TeacherController {
     }
 
     // REST API: get all teachers
-    @GetMapping()
+    @GetMapping("all")
     public ResponseEntity<List<Teacher>> getAllTeachers() {
         List<Teacher> teachers = teacherService.getTeachers();
         return new ResponseEntity<>(teachers, HttpStatus.OK);
     }
 
-    // REST API: get a teacher
-    @GetMapping("{teacherId}")
+    // REST API: get a single teacher by id
+    @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("get/{teacherId}")
     public ResponseEntity<Teacher> getTeacherById(@PathVariable("teacherId") Long teacherId) {
         Teacher teacher = teacherService.getTeacherById(teacherId);
         return new ResponseEntity<Teacher>(teacher, HttpStatus.OK);
